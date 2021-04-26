@@ -19,14 +19,14 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.PDFView.Configurator;
 import com.github.barteksc.pdfviewer.listener.*;
 import com.github.barteksc.pdfviewer.util.Constants;
-import com.github.barteksc.pdfviewer.util.FitPolicy;
+//import com.github.barteksc.pdfviewer.util.FitPolicy;
 
-import com.github.barteksc.pdfviewer.link.LinkHandler;
+//import com.github.barteksc.pdfviewer.link.LinkHandler;
 
 public class FlutterPDFView implements PlatformView, MethodCallHandler {
     private final PDFView pdfView;
     private final MethodChannel methodChannel;
-    private final LinkHandler linkHandler;
+//    private final LinkHandler linkHandler;
 
     @SuppressWarnings("unchecked")
     FlutterPDFView(Context context, BinaryMessenger messenger, int id, Map<String, Object> params) {
@@ -36,16 +36,16 @@ public class FlutterPDFView implements PlatformView, MethodCallHandler {
         methodChannel = new MethodChannel(messenger, "plugins.endigo.io/pdfview_" + id);
         methodChannel.setMethodCallHandler(this);
 
-        linkHandler = new PDFLinkHandler(context, pdfView, methodChannel, preventLinkNavigation);
+//        linkHandler = new PDFLinkHandler(context, pdfView, methodChannel, preventLinkNavigation);
 
         Configurator config = null;
         if (params.get("filePath") != null) {
-          String filePath = (String) params.get("filePath");
-          config = pdfView.fromUri(getURI(filePath));
+            String filePath = (String) params.get("filePath");
+            config = pdfView.fromUri(getURI(filePath));
         }
         else if (params.get("pdfData") != null) {
-          byte[] data = (byte[]) params.get("pdfData");
-          config = pdfView.fromBytes(data);
+            byte[] data = (byte[]) params.get("pdfData");
+            config = pdfView.fromBytes(data);
         }
 
         if (config != null) {
@@ -53,14 +53,14 @@ public class FlutterPDFView implements PlatformView, MethodCallHandler {
                     .enableSwipe(getBoolean(params, "enableSwipe"))
                     .swipeHorizontal(getBoolean(params, "swipeHorizontal"))
                     .password(getString(params, "password"))
-                    .nightMode(getBoolean(params, "nightMode"))
-                    .autoSpacing(getBoolean(params, "autoSpacing"))
-                    .pageFling(getBoolean(params, "pageFling"))
-                    .pageSnap(getBoolean(params, "pageSnap"))
-                    .pageFitPolicy(getFitPolicy(params))
+//                    .nightMode(getBoolean(params, "nightMode"))
+//                    .autoSpacing(getBoolean(params, "autoSpacing"))
+//                    .pageFling(getBoolean(params, "pageFling"))
+//                    .pageSnap(getBoolean(params, "pageSnap"))
+//                    .pageFitPolicy(getFitPolicy(params))
                     .enableAnnotationRendering(true)
-                    .linkHandler(linkHandler).
-                    enableAntialiasing(false)
+//                    .linkHandler(linkHandler)
+                    .enableAntialiasing(false)
                     // .fitEachPage(getBoolean(params,"fitEachPage"))
                     .onPageChange(new OnPageChangeListener() {
                         @Override
@@ -85,14 +85,16 @@ public class FlutterPDFView implements PlatformView, MethodCallHandler {
                     args.put("error", t.toString());
                     methodChannel.invokeMethod("onPageError", args);
                 }
-            }).onRender(new OnRenderListener() {
-                @Override
-                public void onInitiallyRendered(int pages) {
-                    Map<String, Object> args = new HashMap<>();
-                    args.put("pages", pages);
-                    methodChannel.invokeMethod("onRender", args);
-                }
-            }).enableDoubletap(true).defaultPage(getInt(params, "defaultPage")).load();
+            })
+//                    .onRender(new OnRenderListener() {
+//                @Override
+//                public void onInitiallyRendered(int pages) {
+//                    Map<String, Object> args = new HashMap<>();
+//                    args.put("pages", pages);
+//                    methodChannel.invokeMethod("onRender", args);
+//                }
+//            })
+                    .enableDoubletap(true).defaultPage(getInt(params, "defaultPage")).load();
         }
     }
 
@@ -149,20 +151,21 @@ public class FlutterPDFView implements PlatformView, MethodCallHandler {
         for (String key : settings.keySet()) {
             switch (key) {
                 case "enableSwipe":
-                    pdfView.setSwipeEnabled(getBoolean(settings, key));
+                    pdfView.enableSwipe(true);
+//                    pdfView.setSwipeEnabled(getBoolean(settings, key));
                     break;
                 case "nightMode":
-                    pdfView.setNightMode(getBoolean(settings, key));
+//                    pdfView.setNightMode(getBoolean(settings, key));
                     break;
                 case "pageFling":
-                    pdfView.setPageFling(getBoolean(settings, key));
+//                    pdfView.setPageFling(getBoolean(settings, key));
                     break;
                 case "pageSnap":
-                    pdfView.setPageSnap(getBoolean(settings, key));
+//                    pdfView.setPageSnap(getBoolean(settings, key));
                     break;
                 case "preventLinkNavigation":
-                    final PDFLinkHandler plh = (PDFLinkHandler) this.linkHandler;
-                    plh.setPreventLinkNavigation(getBoolean(settings, key));
+//                    final PDFLinkHandler plh = (PDFLinkHandler) this.linkHandler;
+//                    plh.setPreventLinkNavigation(getBoolean(settings, key));
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown PDFView setting: " + key);
@@ -187,18 +190,18 @@ public class FlutterPDFView implements PlatformView, MethodCallHandler {
         return params.containsKey(key) ? (int) params.get(key) : 0;
     }
 
-    FitPolicy getFitPolicy(Map<String, Object> params) {
-        String fitPolicy = getString(params, "fitPolicy");
-        switch (fitPolicy) {
-            case "FitPolicy.WIDTH":
-                return FitPolicy.WIDTH;
-            case "FitPolicy.HEIGHT":
-                return FitPolicy.HEIGHT;
-            case "FitPolicy.BOTH":
-            default:
-                return FitPolicy.BOTH;
-        }
-    }
+//    FitPolicy getFitPolicy(Map<String, Object> params) {
+//        String fitPolicy = getString(params, "fitPolicy");
+//        switch (fitPolicy) {
+//            case "FitPolicy.WIDTH":
+//                return FitPolicy.WIDTH;
+//            case "FitPolicy.HEIGHT":
+//                return FitPolicy.HEIGHT;
+//            case "FitPolicy.BOTH":
+//            default:
+//                return FitPolicy.BOTH;
+//        }
+//    }
 
     private Uri getURI(final String uri) {
         Uri parsed = Uri.parse(uri);
